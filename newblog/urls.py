@@ -21,11 +21,15 @@ from home.views import *
 from django.conf.urls.static import static
 from django.conf import settings
 from blogs import views as blog_views
+from accounts import views as accounts_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),
     path('category/', include('blogs.urls')),
-    path('<slug:slug>/', blog_views.blog_detail_view, name='blog_detail'),
+    path('blogs/<slug:slug>/', blog_views.blog_detail_view, name='blog_detail'),
     path('blog/search/', blog_views.search, name='search'),
+    path('register/', accounts_views.register_view, name='register'),
+    path('login/', accounts_views.login_view, name='login'),
+    path('logout/', accounts_views.logout_view, name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -42,6 +42,9 @@ INSTALLED_APPS = [
 EXTERNAL_APPS = [
     'home',
     'blogs',
+    'accounts',
+    'crispy_forms',
+    'crispy_bootstrap4',
 ]
 INSTALLED_APPS += EXTERNAL_APPS
 
@@ -131,3 +134,7 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
