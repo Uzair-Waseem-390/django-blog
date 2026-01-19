@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+{% comment %} {% if blog_post %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-3">{{ blog_post.title }}</h1>
+            <p class="text-muted">By {{ blog_post.author }} | {{ blog_post.created_at|date:"F j, Y" }}</p>
+            {% if blog_post.featured_image %}
+            <img src="{{ blog_post.featured_image.url }}" class="img-fluid mb-4" alt="{{ blog_post.title }}">
+            {% endif %}
+            <div class="blog-content">
+                {{ blog_post.content|safe }}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% else %}
+<p>Blog post not found.</p>
+{% endif %} {% endcomment %}
+<!-- Page content-->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Post content-->
+            <article>
+                <!-- Post header-->
+                <header class="mb-4">
+                    <!-- Post title-->
+                    <h1 class="fw-bolder mb-1">{{ blog_post.title }}</h1>
+                    <!-- Post meta content-->
+                    <div class="text-muted fst-italic mb-2">Posted on {{ blog_post.created_at|date:"F j, Y" }} by {{ blog_post.author }}</div>
+                    <!-- Post category-->
+                    <a class="badge bg-warning text-decoration-none text-light" href="{% url 'post_by_category' blog_post.category.id %}">{{ blog_post.category }}</a>
+                </header>
+                <!-- Preview image figure-->
+                 {% if blog_post.featured_image %}
+                <figure class="mb-4"><img class="img-fluid rounded" src="{{ blog_post.featured_image.url }}" alt="NO IMAGE FOUND" /></figure>
+                {% else %}
+                <figure class="mb-4"><img class="img-fluid rounded" src="https://via.placeholder.com/900x300.png?text=No+Image+Available" alt="No Image Available" /></figure>
+                {% endif %}
+                <!-- Post content-->
+                <section class="mb-5">
+                    <h2 class="text-warning">Short description</h2>
+                    <p class="fs-5 mb-4">{{ blog_post.short_description|safe }}</p>
+                    <h2 class="text-warning">Blog Content</h2>
+                    <p class="fs-5 mb-4">{{ blog_post.content|safe }}</p>
+                    </section>
+            </article>
+        </div>
+        <!-- Side widgets-->
+        <div class="col-lg-4">
+            
+            <!-- Categories widget-->
+            <div class="card mb-4 p-3">
+                <h4 class="font-italic">Categories</h4>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="list-unstyled mb-0">
+                                {% for i in categories%}
+                                <li><a href="{% url 'post_by_category' i.id %}">{{ i.category_name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            <!-- Side widget-->
+             {% if follow_us_info %}
+            <div class="card mb-4 p-3">
+                <h4 class="font-italic">Follow Us</h4>
+                <ol class="list-unstyled">
+                    {% for follow_us in follow_us_info %}
+                    <li><a href="{{ follow_us.platform_url }}">{{ follow_us.platform_name }}</a></li>
+                    {% endfor %}
+                </ol>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
