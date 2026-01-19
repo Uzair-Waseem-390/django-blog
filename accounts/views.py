@@ -22,7 +22,7 @@ def login_view(request):
         # log user in
         
         login(request, form.get_user())
-        return redirect('/')
+        return redirect('dashboard')  # Redirect to a success page.
     context = {'form': form}
     return render(request, 'login.html', context)
 

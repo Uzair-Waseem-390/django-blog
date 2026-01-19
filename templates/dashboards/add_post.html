@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+
+        <div class="card shadow border-0 rounded-lg">
+            <div class="card-body p-4">
+
+                <h3 class="text-uppercase text-warning text-center mb-4"
+                    style="letter-spacing: 2px;">
+                    Add New Post
+                </h3>
+
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label class="font-weight-bold">Title</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <small class="text-danger">{{ form.title.errors|striptags }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Slug -->
+                    <div class="form-group">
+                        <label class="font-weight-bold">Slug</label>
+                        {{ form.slug }}
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-group">
+                        <label class="font-weight-bold">Category</label>
+                        {{ form.category }}
+                    </div>
+
+                    <!-- Featured Image -->
+                    <div class="form-group">
+                        <label class="font-weight-bold">Featured Image</label>
+                        {{ form.featured_image }}
+                    </div>
+
+                    <!-- Short Description -->
+                    <div class="form-group">
+                        <label class="font-weight-bold">Short Description</label>
+                        {{ form.short_description }}
+                    </div>
+
+                    <!-- Content -->
+                    <div class="form-group">
+                        <label class="font-weight-bold">Content</label>
+                        {{ form.content }}
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-group">
+                        <label class="font-weight-bold">Status</label>
+                        {{ form.status }}
+                    </div>
+
+                    <!-- Featured -->
+                    <div class="form-group form-check">
+                        {{ form.is_featured }}
+                        <label class="form-check-label font-weight-bold">
+                            Featured Post
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-block mt-3">
+                        Publish Post
+                    </button>
+
+                    <a href="{% url 'dashboard' %}" class="btn btn-link btn-block">
+                        Back to Dashboard
+                    </a>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

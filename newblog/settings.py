@@ -45,6 +45,7 @@ EXTERNAL_APPS = [
     'accounts',
     'crispy_forms',
     'crispy_bootstrap4',
+    'dashboards',
 ]
 INSTALLED_APPS += EXTERNAL_APPS
 
