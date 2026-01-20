@@ -73,6 +73,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'blogs.context_processors.blog_categories',
                 'blogs.context_processors.follow_us_links',
+                'accounts.context_processors.user_roles',
             ],
         },
     },
@@ -139,3 +140,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+
+
+handler403 = 'django.views.defaults.permission_denied'

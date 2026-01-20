@@ -1,43 +1,792 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6">
+<style>
+    /* Add Category Page Specific Styles */
+    .add-category-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        animation: fadeIn 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .add-category-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.03'%3E%3Cpath d='M60 120c33.137 0 60-26.863 60-60S93.137 0 60 0 0 26.863 0 60s26.863 60 60 60zm0-20c22.091 0 40-17.909 40-40S82.091 20 60 20 20 37.909 20 60s17.909 40 40 40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        z-index: -1;
+    }
+    
+    .add-category-card {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        position: relative;
+        max-width: 500px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: slideUp 0.8s ease-out;
+    }
+    
+    .add-category-card:hover {
+        transform: translateY(-10px) scale(1.01);
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
+    }
+    
+    .add-category-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(90deg, #10b981, #34d399, #059669);
+        background-size: 200% 100%;
+        animation: gradientShift 3s ease infinite;
+    }
+    
+    /* Category Header */
+    .category-header {
+        padding: 3rem 3rem 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .category-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .category-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #10b981, #34d399);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        z-index: 2;
+        animation: float 6s ease-in-out infinite;
+        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+    }
+    
+    .category-icon i {
+        font-size: 2.5rem;
+        color: white;
+        animation: bounce 2s ease-in-out infinite;
+    }
+    
+    .category-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 2.5rem;
+        background: linear-gradient(90deg, #10b981, #059669);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .category-subtitle {
+        color: #047857;
+        font-size: 1.1rem;
+        position: relative;
+        z-index: 2;
+        opacity: 0.9;
+    }
+    
+    /* Category Body */
+    .category-body {
+        padding: 2rem 3rem 3rem;
+        position: relative;
+    }
+    
+    /* Form Styles */
+    .category-form {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .form-group {
+        margin-bottom: 2rem;
+        animation: slideUp 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    
+    label {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.8rem;
+        display: block;
+        transition: color 0.3s ease;
+        font-size: 1.1rem;
+    }
+    
+    label:hover {
+        color: #10b981;
+    }
+    
+    .form-control {
+        border: 2px solid #d1fae5;
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f0fdf4;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .form-control:focus {
+        border-color: #10b981;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+        outline: none;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #ef4444;
+        background: #fef2f2;
+    }
+    
+    .form-control.is-valid {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    
+    /* Character Counter */
+    .char-counter {
+        text-align: right;
+        font-size: 0.85rem;
+        color: #94a3b8;
+        margin-top: 0.5rem;
+        transition: color 0.3s ease;
+    }
+    
+    .char-counter.warning {
+        color: #f59e0b;
+    }
+    
+    .char-counter.danger {
+        color: #ef4444;
+    }
+    
+    /* Error Messages */
+    .alert {
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border: none;
+        animation: shake 0.5s ease;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        color: #065f46;
+        border-left: 4px solid #10b981;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        animation: slideUp 0.5s ease-out 0.3s both;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+    
+    .btn:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+    }
+    
+    .btn-success {
+        background: linear-gradient(90deg, #10b981, #34d399);
+        color: white;
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+        color: white;
+        background: linear-gradient(90deg, #059669, #10b981);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+        color: white;
+        background: linear-gradient(90deg, #4338ca, #6d28d9);
+    }
+    
+    .btn-outline {
+        background: white;
+        color: #10b981;
+        border: 2px solid #10b981;
+    }
+    
+    .btn-outline:hover {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+        transform: translateY(-3px);
+        color: #10b981;
+    }
+    
+    .btn i {
+        transition: transform 0.3s ease;
+    }
+    
+    .btn:hover i {
+        transform: translateX(5px);
+    }
+    
+    /* Success Preview */
+    .success-preview {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 2px dashed #10b981;
+        display: none;
+        animation: slideUp 0.5s ease-out;
+    }
+    
+    .success-preview.show {
+        display: block;
+    }
+    
+    .preview-title {
+        color: #065f46;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .preview-category {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #10b981;
+        background: white;
+        padding: 0.8rem 1.2rem;
+        border-radius: 8px;
+        display: inline-block;
+        margin-top: 0.5rem;
+        border: 2px solid #a7f3d0;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes gradientShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-15px);
+        }
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0) scale(1);
+        }
+        40% {
+            transform: translateY(-10px) scale(1.1);
+        }
+        60% {
+            transform: translateY(-5px) scale(1.05);
+        }
+    }
+    
+    @keyframes ripple {
+        0% {
+            transform: scale(0, 0);
+            opacity: 1;
+        }
+        20% {
+            transform: scale(25, 25);
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: scale(40, 40);
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+        }
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+        }
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .add-category-container {
+            padding: 1rem;
+        }
+        
+        .add-category-card {
+            margin: 1rem;
+        }
+        
+        .category-header {
+            padding: 2rem 2rem 1.5rem;
+        }
+        
+        .category-body {
+            padding: 1.5rem 2rem 2rem;
+        }
+        
+        .category-title {
+            font-size: 2rem;
+        }
+        
+        .category-icon {
+            width: 70px;
+            height: 70px;
+        }
+        
+        .category-icon i {
+            font-size: 2rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .category-header {
+            padding: 1.5rem 1.5rem 1rem;
+        }
+        
+        .category-body {
+            padding: 1rem 1.5rem 1.5rem;
+        }
+        
+        .category-title {
+            font-size: 1.8rem;
+        }
+        
+        .category-subtitle {
+            font-size: 1rem;
+        }
+        
+        .form-control {
+            padding: 0.9rem 1rem;
+        }
+    }
+</style>
 
-        <div class="card shadow border-0 rounded-lg">
-            <div class="card-body p-4">
-
-                <h3 class="text-uppercase text-warning text-center mb-4"
-                    style="letter-spacing: 2px;">
-                    Add Category
-                </h3>
-
-                <form method="POST" novalidate>
-                    {% csrf_token %}
-                    {{ form.non_field_errors }}
-
-                    <div class="form-group">
-                        <label class="font-weight-bold">Category Name</label>
-                        {{ form.category_name }}
-                        {% if form.category_name.errors %}
-                            <small class="text-danger">
-                                {{ form.category_name.errors|striptags }}
-                            </small>
-                        {% endif %}
-                    </div>
-
-                    <button type="submit" class="btn btn-success btn-block mt-3">
-                        Add Category
-                    </button>
-
-                    <a href="{% url 'dashboard' %}" class="btn btn-link btn-block">
-                        Back to Dashboard
-                    </a>
-                </form>
-
+<div class="add-category-container">
+    <div class="add-category-card">
+        <!-- Category Header -->
+        <div class="category-header">
+            <div class="category-icon">
+                <i class="fas fa-plus-circle"></i>
             </div>
+            <h1 class="category-title">Create Category</h1>
+            <p class="category-subtitle">Add a new category to organize your blog posts</p>
         </div>
-
+        
+        <!-- Category Body -->
+        <div class="category-body">
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Please correct the errors below.
+            </div>
+            {% endif %}
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="POST" novalidate class="category-form">
+                {% csrf_token %}
+                
+                <!-- Category Name Field -->
+                <div class="form-group">
+                    <label for="id_category_name">Category Name</label>
+                    <input type="text" 
+                           name="category_name" 
+                           id="id_category_name" 
+                           class="form-control" 
+                           placeholder="Enter category name (e.g., Technology, Travel, Food)"
+                           required
+                           autofocus
+                           maxlength="100"
+                           value="{{ form.category_name.value|default:'' }}">
+                    
+                    {% if form.category_name.errors %}
+                    <div class="invalid-feedback d-block" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem;">
+                        {{ form.category_name.errors|striptags }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="char-counter" id="charCounter">
+                        <span id="charCount">0</span>/100 characters
+                    </div>
+                </div>
+                
+                <!-- Success Preview -->
+                <div class="success-preview" id="successPreview">
+                    <div class="preview-title">
+                        <i class="fas fa-eye"></i>
+                        Category Preview
+                    </div>
+                    <p>Your new category will appear as:</p>
+                    <div class="preview-category" id="categoryPreview">
+                        Enter category name
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Create Category</span>
+                    </button>
+                    
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to Dashboard</span>
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+<!-- Animation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryInput = document.getElementById('id_category_name');
+        const charCounter = document.getElementById('charCounter');
+        const charCount = document.getElementById('charCount');
+        const successPreview = document.getElementById('successPreview');
+        const categoryPreview = document.getElementById('categoryPreview');
+        const submitBtn = document.querySelector('.btn-success');
+        
+        // Character counter functionality
+        if (categoryInput) {
+            categoryInput.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = length;
+                
+                // Update counter color based on length
+                if (length === 0) {
+                    charCounter.className = 'char-counter';
+                } else if (length > 80) {
+                    charCounter.className = 'char-counter danger';
+                } else if (length > 60) {
+                    charCounter.className = 'char-counter warning';
+                } else {
+                    charCounter.className = 'char-counter';
+                }
+                
+                // Update preview
+                updatePreview(this.value);
+            });
+            
+            // Initial update
+            charCount.textContent = categoryInput.value.length;
+            updatePreview(categoryInput.value);
+            
+            // Focus animation
+            categoryInput.addEventListener('focus', function() {
+                this.parentElement.querySelector('label').style.color = '#10b981';
+                this.style.borderColor = '#10b981';
+                this.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.1)';
+            });
+            
+            categoryInput.addEventListener('blur', function() {
+                this.parentElement.querySelector('label').style.color = '#1e293b';
+                if (this.value.trim() === '') {
+                    this.style.borderColor = '#d1fae5';
+                    this.style.boxShadow = '';
+                }
+            });
+            
+            // Validation on input
+            categoryInput.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else {
+                    this.classList.remove('is-valid');
+                }
+            });
+        }
+        
+        // Update preview function
+        function updatePreview(value) {
+            if (value.trim() !== '') {
+                categoryPreview.textContent = value;
+                successPreview.classList.add('show');
+                
+                // Add pulsing animation to preview
+                categoryPreview.style.animation = 'pulse 2s';
+                setTimeout(() => {
+                    categoryPreview.style.animation = '';
+                }, 2000);
+            } else {
+                successPreview.classList.remove('show');
+            }
+        }
+        
+        // Form submission animation
+        const form = document.querySelector('.category-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Validate category name
+                const categoryName = categoryInput.value.trim();
+                if (!categoryName) {
+                    e.preventDefault();
+                    categoryInput.classList.add('is-invalid');
+                    categoryInput.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        categoryInput.style.animation = '';
+                    }, 500);
+                    
+                    // Show error message
+                    let errorDiv = categoryInput.parentElement.querySelector('.invalid-feedback');
+                    if (!errorDiv) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.className = 'invalid-feedback d-block';
+                        errorDiv.style.color = '#ef4444';
+                        errorDiv.style.fontSize = '0.85rem';
+                        errorDiv.style.marginTop = '0.5rem';
+                        errorDiv.textContent = 'Category name is required.';
+                        categoryInput.parentElement.appendChild(errorDiv);
+                    }
+                    return;
+                }
+                
+                // Show loading state
+                if (submitBtn) {
+                    const originalHTML = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                    submitBtn.disabled = true;
+                    
+                    // Revert after 5 seconds if still on page
+                    setTimeout(() => {
+                        if (submitBtn.disabled) {
+                            submitBtn.innerHTML = originalHTML;
+                            submitBtn.disabled = false;
+                        }
+                    }, 5000);
+                }
+            });
+        }
+        
+        // Category icon hover effect
+        const categoryIcon = document.querySelector('.category-icon');
+        if (categoryIcon) {
+            categoryIcon.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1) rotate(10deg)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            
+            categoryIcon.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+            
+            categoryIcon.addEventListener('click', function() {
+                // Add click animation
+                this.style.animation = 'bounce 0.5s ease, pulse 2s infinite 0.5s';
+                setTimeout(() => {
+                    this.style.animation = 'float 6s ease-in-out infinite, bounce 2s ease-in-out infinite';
+                }, 500);
+            });
+        }
+        
+        // Card hover effect on form focus
+        const addCategoryCard = document.querySelector('.add-category-card');
+        if (addCategoryCard && categoryInput) {
+            categoryInput.addEventListener('focus', function() {
+                addCategoryCard.style.transform = 'translateY(-10px) scale(1.01)';
+            });
+            
+            categoryInput.addEventListener('blur', function() {
+                addCategoryCard.style.transform = 'translateY(0) scale(1)';
+            });
+        }
+        
+        // Back button animation
+        const backBtn = document.querySelector('.btn-secondary');
+        if (backBtn) {
+            backBtn.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'translateX(-5px)';
+                }
+            });
+            
+            backBtn.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'translateX(0)';
+                }
+            });
+            
+            backBtn.addEventListener('click', function(e) {
+                // Add click animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        }
+        
+        // Auto-focus on category input with animation
+        if (categoryInput) {
+            setTimeout(() => {
+                categoryInput.focus();
+                categoryInput.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.3)';
+                setTimeout(() => {
+                    categoryInput.style.boxShadow = '';
+                }, 1500);
+            }, 500);
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                if (submitBtn) submitBtn.click();
+            } else if (e.key === 'Escape') {
+                if (backBtn) backBtn.click();
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -7,52 +7,641 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Django Blogs</title>
-    <link href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
-  </head>
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .container {
+            flex: 1;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Header Styling */
+        .blog-header {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-top: 1.5rem;
+            padding: 1rem 2rem !important;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .blog-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .blog-header:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .blog-header-logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            display: inline-block;
+        }
+
+        .blog-header-logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--secondary);
+            transition: width 0.4s ease;
+        }
+
+        .blog-header-logo:hover::after {
+            width: 100%;
+        }
+
+        /* Search Bar Styling */
+        .input-group {
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .input-group:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .form-control {
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+            border-radius: 50px 0 0 50px;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: var(--primary);
+        }
+
+        #button-search {
+            background: linear-gradient(90deg, var(--secondary), #fbbf24);
+            border: none;
+            border-radius: 0 50px 50px 0;
+            padding: 0.8rem 1.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        #button-search:hover {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            transform: translateX(3px);
+        }
+
+        /* Button Styling */
+        .btn-warning {
+            background: linear-gradient(90deg, var(--secondary), #fbbf24);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.4);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid var(--gray);
+            color: var(--gray);
+            font-weight: 500;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            transition: var(--transition);
+        }
+
+        .btn-outline-secondary:hover {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* FIXED: Category Navigation Bar - No Sticky Behavior */
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            margin: 2rem 0;
+            width: 100%;
+        }
+
+        .nav {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem !important;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            overflow: visible;
+            width: 100%;
+        }
+
+        .nav a {
+            color: var(--gray);
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            border-radius: 50px;
+            white-space: nowrap;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            border: 1px solid transparent;
+        }
+
+        .nav a i {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.1), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .nav a:hover {
+            background: linear-gradient(90deg, rgba(79, 70, 229, 0.1), rgba(245, 158, 11, 0.1));
+            color: var(--primary);
+            transform: translateY(-2px);
+            border-color: rgba(79, 70, 229, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav a:hover i {
+            transform: rotate(15deg);
+        }
+
+        .nav a:hover::before {
+            left: 100%;
+        }
+
+        .nav a.active {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Category Badge for Current Page */
+        .current-category {
+            position: relative;
+            animation: bounceIn 0.5s ease;
+        }
+
+        .current-category::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        /* Badge Styling */
+        .badge-info {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Footer Styling */
+        .blog-footer {
+            text-align: center;
+            padding: 2.5rem 0;
+            margin-top: 4rem;
+            background: white;
+            border-radius: var(--radius) var(--radius) 0 0;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blog-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .blog-footer p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin: 0;
+        }
+
+        .blog-footer a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .blog-footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        .blog-footer a:hover {
+            color: var(--primary-dark);
+        }
+
+        .blog-footer a:hover::after {
+            width: 100%;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Category Loader Animation */
+        .categories-loading {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .category-skeleton {
+            width: 100px;
+            height: 40px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 50px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Responsive Design for Categories */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 0.8rem !important;
+                gap: 0.4rem;
+                justify-content: flex-start;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                scrollbar-width: thin;
+                scrollbar-color: var(--primary) transparent;
+            }
+            
+            .nav::-webkit-scrollbar {
+                height: 6px;
+            }
+            
+            .nav::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 3px;
+            }
+            
+            .nav::-webkit-scrollbar-thumb {
+                background: var(--primary);
+                border-radius: 3px;
+            }
+            
+            .nav a {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.9rem;
+                flex-shrink: 0;
+            }
+            
+            .nav a i {
+                margin-right: 0.3rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-scroller {
+                margin: 1.5rem 0;
+            }
+            
+            .nav {
+                padding: 0.6rem !important;
+            }
+            
+            .nav a {
+                padding: 0.4rem 0.8rem !important;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .nav {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .blog-header-logo {
+                font-size: 1.8rem;
+            }
+            
+            .input-group {
+                max-width: 100%;
+                margin-top: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-header {
+                padding: 1rem !important;
+            }
+            
+            .col-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+            
+            .blog-header-logo {
+                display: block;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
 <body>
     <div class="container">
       <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
-          <div class="col-4 pt-1">
+          <div class="col-12 col-md-4 pt-1 text-center text-md-start">
             <a class="blog-header-logo text-dark" href="/">Django Blog</a>
           </div>
-          <div class="col-4">
-            <form action = "{% url 'search' %}" method="GET">
+          <div class="col-12 col-md-4 my-3 my-md-0">
+            <form action="{% url 'search' %}" method="GET">
               <div class="input-group">
-                        <input class="form-control" type="text" name= "keyword" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                        <button type="submit" class="btn btn-warning" id="button-search" type="button">Go!</button>
-                    </div>
+                <input class="form-control" type="text" name="keyword" placeholder="Search articles..." aria-label="Enter search term..." aria-describedby="button-search" />
+                <button type="submit" class="btn btn-warning" id="button-search">
+                  <i class="fas fa-search"></i> Search
+                </button>
+              </div>
             </form>
           </div>
-          <div class="col-4 d-flex justify-content-end align-items-center">
+          <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end align-items-center">
             {% if not user.is_authenticated %}
-            <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
-            <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
+            <a class="btn btn-sm btn-warning me-2" href="{% url 'login' %}">
+              <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">
+              <i class="fas fa-user-plus"></i> Register
+            </a>
             {% else %}
-            <a class="btn btn-sm btn-warning" href="{% url 'dashboard' %}">Dashboard</a> &nbsp;
-            <a class="btn btn-sm btn-outline-secondary" href="{% url 'logout' %}">Logout</a>
+              {# Show dashboard button only for managers and editors #}
+              {% if is_manager or is_editor %}
+              <a class="btn btn-sm btn-warning me-2" href="{% url 'dashboard' %}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+              </a>
+              {% endif %}
+              <a class="btn btn-sm btn-outline-secondary me-2" href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
+              <span class="badge badge-info">
+                {% if is_manager %}
+                <i class="fas fa-crown"></i> Manager
+                {% elif is_editor %}
+                <i class="fas fa-edit"></i> Editor
+                {% else %}
+                <i class="fas fa-user"></i> User
+                {% endif %}
+              </span>
             {% endif %}
           </div>
         </div>
       </header>
 
-      <div class="nav-scroller py-1 mb-2">
-        <nav class="nav d-flex justify-content-between">
-          {% for i in categories %}
-          <a class="p-2 text-muted" href={% url 'post_by_category' i.id %}>{{ i.category_name }}</a>
-          {% endfor %}
+      <!-- Category Navigation Bar - FIXED: No sticky behavior -->
+      <div class="nav-scroller py-1 mb-4">
+        <nav class="nav d-flex justify-content-center">
+          {% if categories %}
+            {% for category in categories %}
+            <a class="p-2 text-muted category-link {% if current_category_id == category.id %}active current-category{% endif %}" 
+               href="{% url 'post_by_category' category.id %}"
+               title="{{ category.category_name }}">
+              <i class="fas fa-folder"></i> {{ category.category_name }}
+            </a>
+            {% endfor %}
+          {% else %}
+            <!-- Skeleton loading animation when no categories -->
+            <div class="categories-loading">
+              <div class="category-skeleton"></div>
+              <div class="category-skeleton"></div>
+              <div class="category-skeleton"></div>
+              <div class="category-skeleton"></div>
+              <div class="category-skeleton"></div>
+            </div>
+          {% endif %}
         </nav>
       </div>
 
-        {% block content %}
-        {% endblock %}
-
-
+      {% block content %}
+      {% endblock %}
 
     <footer class="blog-footer">
-  <p>Django blog built with � by <a href="#">Rathan Kumar</a></p>
-</footer>
+      <p>Django blog built with <span style="color: #ef4444;">❤️</span> by <a href="https://www.linkedin.com/in/uzair-waseem-digital/">Uzair Waseem</a></p>
+      <p class="mt-2 text-muted" style="font-size: 0.9rem;">
+        <i class="fas fa-code"></i> Crafted with Django & Bootstrap
+      </p>
+    </footer>
+</div>
+
+    <!-- Bootstrap & Animation Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add animation on scroll for nav items
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate category links with staggered delay
+            const categoryLinks = document.querySelectorAll('.category-link');
+            categoryLinks.forEach((link, index) => {
+                link.style.animationDelay = `${index * 0.1}s`;
+                link.classList.add('animate__animated', 'animate__fadeIn');
+            });
+            
+            // Add hover effect to all buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // FIXED: Removed sticky behavior for category bar
+            // Only header gets scroll effect
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('.blog-header');
+                if (window.scrollY > 50) {
+                    header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                    header.style.paddingTop = '0.5rem';
+                    header.style.paddingBottom = '0.5rem';
+                } else {
+                    header.style.boxShadow = 'var(--shadow)';
+                    header.style.paddingTop = '1rem';
+                    header.style.paddingBottom = '1rem';
+                }
+            });
+            
+            // Current category highlight
+            const currentCategory = document.querySelector('.current-category');
+            if (currentCategory) {
+                // Add pulsing animation to current category
+                currentCategory.style.animation = 'bounceIn 0.5s ease, pulse 2s infinite 0.5s';
+            }
+            
+            // Smooth scrolling for category navigation
+            document.querySelectorAll('.category-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Remove active class from all links
+                    document.querySelectorAll('.category-link').forEach(l => {
+                        l.classList.remove('active', 'current-category');
+                    });
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active', 'current-category');
+                    
+                    // Add click animation
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+            
+            // Category bar auto-scroll to current category on mobile
+            if (window.innerWidth <= 768 && currentCategory) {
+                currentCategory.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'center'
+                });
+            }
+            
+            // Initialize tooltips for category links
+            categoryLinks.forEach(link => {
+                const title = link.getAttribute('title');
+                if (title && title.length > 20) {
+                    link.setAttribute('data-bs-toggle', 'tooltip');
+                    link.setAttribute('data-bs-placement', 'bottom');
+                }
+            });
+            
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 </body>
 </html>

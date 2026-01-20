@@ -1,59 +1,833 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    /* Login Page Specific Styles */
+    .login-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        animation: fadeIn 0.8s ease-out;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234f46e5' fill-opacity='0.02'%3E%3Cpath d='M60 120c33.137 0 60-26.863 60-60S93.137 0 60 0 0 26.863 0 60s26.863 60 60 60zm0-20c22.091 0 40-17.909 40-40S82.091 20 60 20 20 37.909 20 60s17.909 40 40 40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .login-card {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        position: relative;
+        max-width: 450px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        z-index: 2;
+    }
+    
+    .login-card:hover {
+        transform: translateY(-10px) scale(1.01);
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.2);
+    }
+    
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24, #4f46e5);
+        background-size: 200% 100%;
+        animation: gradientShift 3s ease infinite;
+    }
+    
+    .login-header {
+        padding: 3rem 3rem 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f59e0b' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .login-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        z-index: 2;
+        animation: float 6s ease-in-out infinite;
+        box-shadow: 0 15px 30px rgba(245, 158, 11, 0.3);
+    }
+    
+    .login-icon i {
+        font-size: 2.5rem;
+        color: white;
+        animation: bounce 2s ease-in-out infinite;
+    }
+    
+    .login-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 2.5rem;
+        background: linear-gradient(90deg, #f59e0b, #4f46e5);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .login-subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .login-body {
+        padding: 2rem 3rem 3rem;
+        position: relative;
+    }
+    
+    /* Form Styles */
+    .login-form {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .form-group {
+        margin-bottom: 1.8rem;
+        animation: slideUp 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    
+    label {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        display: block;
+        transition: color 0.3s ease;
+    }
+    
+    label:hover {
+        color: #4f46e5;
+    }
+    
+    .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.9rem 1.2rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        width: 100%;
+    }
+    
+    .form-control:focus {
+        border-color: #4f46e5;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #ef4444;
+        background: #fef2f2;
+    }
+    
+    .form-control.is-valid {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    
+    /* Password toggle */
+    .password-wrapper {
+        position: relative;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #64748b;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        z-index: 3;
+    }
+    
+    .password-toggle:hover {
+        color: #4f46e5;
+    }
+    
+    /* Remember me checkbox */
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+        animation: slideUp 0.5s ease-out 0.3s both;
+    }
+    
+    .remember-me input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #4f46e5;
+        cursor: pointer;
+    }
+    
+    .remember-me label {
+        font-weight: normal;
+        font-size: 0.95rem;
+        color: #64748b;
+        cursor: pointer;
+        margin: 0;
+    }
+    
+    /* Submit Button */
+    .submit-btn {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        width: 100%;
+        margin-top: 0.5rem;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        position: relative;
+        overflow: hidden;
+        animation: slideUp 0.5s ease-out 0.4s both;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+        background: linear-gradient(90deg, #4338ca, #6d28d9);
+    }
+    
+    .submit-btn:active {
+        transform: translateY(-1px);
+    }
+    
+    .submit-btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+    
+    .submit-btn:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+    }
+    
+    .submit-btn i {
+        transition: transform 0.3s ease;
+    }
+    
+    .submit-btn:hover i {
+        transform: translateX(5px);
+    }
+    
+    /* Register Link */
+    .register-link {
+        text-align: center;
+        margin-top: 2rem;
+        color: #64748b;
+        font-size: 0.95rem;
+        animation: slideUp 0.5s ease-out 0.5s both;
+    }
+    
+    .register-link a {
+        color: #4f46e5;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+        padding-bottom: 2px;
+    }
+    
+    .register-link a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #f59e0b, #4f46e5);
+        transition: width 0.3s ease;
+    }
+    
+    .register-link a:hover {
+        color: #f59e0b;
+    }
+    
+    .register-link a:hover::after {
+        width: 100%;
+    }
+    
+    /* Forgot Password */
+    .forgot-password {
+        text-align: center;
+        margin-top: 1rem;
+        animation: slideUp 0.5s ease-out 0.6s both;
+    }
+    
+    .forgot-password a {
+        color: #64748b;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .forgot-password a:hover {
+        color: #4f46e5;
+        text-decoration: underline;
+    }
+    
+    /* Error Messages */
+    .alert {
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border: none;
+        animation: shake 0.5s ease;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        color: #065f46;
+        border-left: 4px solid #10b981;
+    }
+    
+    /* Social Login */
+    .social-login {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f1f5f9;
+        animation: slideUp 0.5s ease-out 0.7s both;
+    }
+    
+    .social-login-title {
+        text-align: center;
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .social-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .social-btn {
+        flex: 1;
+        padding: 0.8rem;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        color: #64748b;
+        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .social-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .social-btn.google:hover {
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+    
+    .social-btn.github:hover {
+        border-color: #1e293b;
+        color: #1e293b;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes gradientShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-15px);
+        }
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0) scale(1);
+        }
+        40% {
+            transform: translateY(-10px) scale(1.1);
+        }
+        60% {
+            transform: translateY(-5px) scale(1.05);
+        }
+    }
+    
+    @keyframes ripple {
+        0% {
+            transform: scale(0, 0);
+            opacity: 1;
+        }
+        20% {
+            transform: scale(25, 25);
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: scale(40, 40);
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+        }
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 1rem;
+        }
+        
+        .login-card {
+            margin: 1rem;
+        }
+        
+        .login-header {
+            padding: 2rem 2rem 1.5rem;
+        }
+        
+        .login-body {
+            padding: 1.5rem 2rem 2rem;
+        }
+        
+        .login-title {
+            font-size: 2rem;
+        }
+        
+        .login-icon {
+            width: 70px;
+            height: 70px;
+        }
+        
+        .login-icon i {
+            font-size: 2rem;
+        }
+        
+        .social-buttons {
+            flex-direction: column;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .login-header {
+            padding: 1.5rem 1.5rem 1rem;
+        }
+        
+        .login-body {
+            padding: 1rem 1.5rem 1.5rem;
+        }
+        
+        .login-title {
+            font-size: 1.8rem;
+        }
+        
+        .login-subtitle {
+            font-size: 1rem;
+        }
+        
+        .form-control {
+            padding: 0.8rem 1rem;
+        }
+        
+        .submit-btn {
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+        }
+    }
+</style>
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5">
-
-        <div class="card shadow border-0 rounded-lg">
-            <div class="card-body p-4">
-
-                <h3 class="text-uppercase text-warning text-center mb-4"
-                    style="letter-spacing: 2px;">
-                    Login
-                </h3>
-
-                <form method="POST" novalidate>
-                    {% csrf_token %}
-
-                    <!-- Username -->
-                    <div class="form-group">
-                        <label class="font-weight-bold">Username</label>
-                        {{ form.username }}
-                        {% if form.username.errors %}
-                            <small class="text-danger">
-                                {{ form.username.errors|striptags }}
-                            </small>
-                        {% endif %}
-                    </div>
-
-                    <!-- Password -->
-                    <div class="form-group">
-                        <label class="font-weight-bold">Password</label>
-                        {{ form.password }}
-                        {% if form.password.errors %}
-                            <small class="text-danger">
-                                {{ form.password.errors|striptags }}
-                            </small>
-                        {% endif %}
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block mt-3">
-                        Login
-                    </button>
-                </form>
-
-                <div class="text-center mt-3">
-                    <small>
-                        Don't have an account?
-                        <a href="{% url 'register' %}" class="text-primary font-weight-bold">Register</a>
-                    </small>
-                </div>
-
+<div class="login-container">
+    <div class="login-card">
+        <!-- Login Header -->
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fas fa-sign-in-alt"></i>
             </div>
+            <h1 class="login-title">Welcome Back</h1>
+            <p class="login-subtitle">Sign in to your account</p>
         </div>
-
+        
+        <!-- Login Body -->
+        <div class="login-body">
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Invalid username or password. Please try again.
+            </div>
+            {% endif %}
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="POST" novalidate class="login-form">
+                {% csrf_token %}
+                
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="id_username">Username or Email</label>
+                    <input type="text" 
+                           name="username" 
+                           id="id_username" 
+                           class="form-control" 
+                           placeholder="Enter your username or email"
+                           required
+                           autofocus>
+                    {% if form.username.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.username.errors|striptags }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="id_password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" 
+                               name="password" 
+                               id="id_password" 
+                               class="form-control" 
+                               placeholder="Enter your password"
+                               required>
+                        <button type="button" class="password-toggle" id="passwordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.password.errors|striptags }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Remember Me -->
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">
+                    <span>Sign In</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                
+                <!-- Forgot Password -->
+                <div class="forgot-password">
+                    <a href="#">Forgot your password?</a>
+                </div>
+                
+                <!-- Register Link -->
+                <div class="register-link">
+                    Don't have an account? 
+                    <a href="{% url 'register' %}">Create one here</a>
+                </div>
+                
+                <!-- Social Login (Optional) -->
+                <div class="social-login">
+                    <div class="social-login-title">Or sign in with</div>
+                    <div class="social-buttons">
+                        <a href="#" class="social-btn google">
+                            <i class="fab fa-google"></i>
+                            <span>Google</span>
+                        </a>
+                        <a href="#" class="social-btn github">
+                            <i class="fab fa-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
+<!-- Animation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password toggle functionality
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('id_password');
+        
+        if (passwordToggle && passwordInput) {
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle eye icon
+                const icon = this.querySelector('i');
+                if (type === 'text') {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+                
+                // Add animation effect
+                this.style.transform = 'translateY(-50%) scale(1.2)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-50%) scale(1)';
+                }, 200);
+            });
+        }
+        
+        // Form field focus effects
+        const formControls = document.querySelectorAll('.form-control');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                this.parentElement.querySelector('label').style.color = '#4f46e5';
+                this.style.borderColor = '#4f46e5';
+            });
+            
+            control.addEventListener('blur', function() {
+                this.parentElement.querySelector('label').style.color = '#1e293b';
+                if (this.value.trim() === '') {
+                    this.style.borderColor = '#e2e8f0';
+                }
+            });
+            
+            control.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else {
+                    this.classList.remove('is-valid');
+                }
+            });
+        });
+        
+        // Form submission animation
+        const form = document.querySelector('.login-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('.submit-btn');
+                if (submitBtn) {
+                    // Show loading state
+                    const originalHTML = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+                    submitBtn.disabled = true;
+                    
+                    // Add shake animation if there are errors
+                    setTimeout(() => {
+                        const errors = document.querySelector('.alert-danger');
+                        if (errors && submitBtn.disabled) {
+                            submitBtn.innerHTML = originalHTML;
+                            submitBtn.disabled = false;
+                            errors.classList.add('shake');
+                            setTimeout(() => {
+                                errors.classList.remove('shake');
+                            }, 500);
+                        }
+                    }, 2000);
+                }
+            });
+        }
+        
+        // Login icon hover effect
+        const loginIcon = document.querySelector('.login-icon');
+        if (loginIcon) {
+            loginIcon.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1) rotate(10deg)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            
+            loginIcon.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        }
+        
+        // Card hover effect on form focus
+        const loginCard = document.querySelector('.login-card');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                loginCard.style.transform = 'translateY(-10px) scale(1.01)';
+            });
+            
+            control.addEventListener('blur', function() {
+                if (!Array.from(formControls).some(c => c === document.activeElement)) {
+                    loginCard.style.transform = 'translateY(0) scale(1)';
+                }
+            });
+        });
+        
+        // Social buttons animation
+        const socialButtons = document.querySelectorAll('.social-btn');
+        socialButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('i');
+                icon.style.transform = 'scale(1.2)';
+                icon.style.transition = 'transform 0.3s ease';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('i');
+                icon.style.transform = 'scale(1)';
+            });
+            
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+                
+                // Show coming soon message
+                alert('Social login integration coming soon!');
+            });
+        });
+        
+        // Remember me checkbox animation
+        const rememberCheckbox = document.querySelector('#remember');
+        if (rememberCheckbox) {
+            rememberCheckbox.addEventListener('change', function() {
+                const label = this.nextElementSibling;
+                if (this.checked) {
+                    label.style.color = '#4f46e5';
+                    label.style.fontWeight = '600';
+                } else {
+                    label.style.color = '#64748b';
+                    label.style.fontWeight = 'normal';
+                }
+            });
+        }
+        
+        // Auto-focus username field with animation
+        const usernameInput = document.getElementById('id_username');
+        if (usernameInput) {
+            setTimeout(() => {
+                usernameInput.focus();
+                usernameInput.style.boxShadow = '0 0 0 4px rgba(79, 70, 229, 0.3)';
+                setTimeout(() => {
+                    usernameInput.style.boxShadow = '';
+                }, 1000);
+            }, 500);
+        }
+    });
+</script>
 {% endblock %}

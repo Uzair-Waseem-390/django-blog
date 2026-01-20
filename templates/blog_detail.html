@@ -1,90 +1,889 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
+<style>
+    /* FIXED: Header Height Adjustments */
+    .blog-header {
+        min-height: 80px; /* Reduced from auto */
+        padding: 0.75rem 2rem !important; /* Reduced padding */
+    }
+    
+    .blog-header-logo {
+        font-size: 1.8rem; /* Slightly smaller */
+    }
+    
+    /* Adjust search bar for compact header */
+    .input-group {
+        max-width: 350px; /* Slightly smaller */
+    }
+    
+    .form-control {
+        padding: 0.6rem 1.2rem; /* Smaller padding */
+        font-size: 0.9rem;
+    }
+    
+    #button-search {
+        padding: 0.6rem 1.5rem; /* Smaller padding */
+    }
+    
+    /* Adjust button sizes */
+    .btn-sm {
+        padding: 0.4rem 1rem; /* Smaller buttons */
+        font-size: 0.85rem;
+    }
+    
+    .badge-info {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.75rem;
+    }
+    
+    /* Nav scroller adjustments for compact header */
+    .nav-scroller {
+        margin: 1.5rem 0; /* Reduced margin */
+    }
+    
+    /* Post container adjustments */
+    .post-container {
+        margin-top: 1rem; /* Less space after header */
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .blog-header {
+            min-height: auto;
+            padding: 0.75rem 1rem !important;
+        }
+        
+        .blog-header-logo {
+            font-size: 1.6rem;
+        }
+        
+        .input-group {
+            max-width: 100%;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .blog-header {
+            padding: 0.5rem !important;
+        }
+        
+        .blog-header-logo {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .nav-scroller {
+            margin: 1rem 0;
+        }
+    }
+    
+    /* The rest of your existing detail_post.html styles remain unchanged below */
+    /* Detail Post Specific Styles */
+    .post-container {
+        animation: fadeIn 0.8s ease-out;
+    }
+    
+    /* Post Header */
+    .post-header {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #f1f5f9;
+        animation: slideDown 0.8s ease-out;
+    }
+    
+    .post-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 3.2rem;
+        line-height: 1.2;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(90deg, #1e293b, #334155);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        position: relative;
+    }
+    
+    .post-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .meta-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    .meta-item i {
+        margin-right: 0.5rem;
+        color: #f59e0b;
+    }
+    
+    .category-badge {
+        display: inline-block;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    .category-badge:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        color: white;
+    }
+    
+    /* Featured Image */
+    .featured-image-container {
+        border-radius: 20px;
+        overflow: hidden;
+        margin: 2.5rem 0;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        position: relative;
+        animation: zoomIn 1s ease-out;
+        transition: transform 0.5s ease;
+    }
+    
+    .featured-image-container:hover {
+        transform: scale(1.01);
+    }
+    
+    .featured-image-container img {
+        width: 100%;
+        height: auto;
+        transition: transform 0.8s ease;
+    }
+    
+    .featured-image-container:hover img {
+        transform: scale(1.03);
+    }
+    
+    .image-placeholder {
+        width: 100%;
+        height: 400px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    /* Content Sections */
+    .content-section {
+        margin-bottom: 3rem;
+        animation: fadeInUp 0.8s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 2.2rem;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.8rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        border-radius: 2px;
+    }
+    
+    .content-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #475569;
+    }
+    
+    .content-text p {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Comments Section */
+    .comments-section {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin: 3rem 0;
+        animation: slideUp 0.8s ease-out;
+    }
+    
+    .comments-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .comments-count {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-left: 1rem;
+        animation: pulse 2s infinite;
+    }
+    
+    .comment-card {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #f59e0b;
+        transition: all 0.3s ease;
+        animation: fadeInRight 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .comment-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .comment-user {
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+    }
+    
+    .comment-user i {
+        margin-right: 0.5rem;
+        color: #4f46e5;
+    }
+    
+    .comment-time {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+    
+    .comment-text {
+        color: #475569;
+        line-height: 1.6;
+        margin: 0;
+    }
+    
+    .no-comments {
+        text-align: center;
+        padding: 3rem;
+        color: #64748b;
+        background: #f8fafc;
+        border-radius: 16px;
+        border: 2px dashed #cbd5e1;
+    }
+    
+    .no-comments i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #cbd5e1;
+    }
+    
+    /* Comment Form */
+    .comment-form-container {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin-top: 3rem;
+        animation: slideUp 0.8s ease-out 0.3s both;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.8rem;
+        display: block;
+    }
+    
+    .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        resize: vertical;
+        min-height: 150px;
+    }
+    
+    .form-control:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .submit-btn {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(79, 70, 229, 0.4);
+    }
+    
+    .submit-btn:active {
+        transform: translateY(-1px);
+    }
+    
+    /* Sidebar */
+    .sidebar-widget {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+        animation: fadeInRight 0.8s ease-out;
+    }
+    
+    .sidebar-widget:hover {
+        transform: translateY(-5px);
+    }
+    
+    .widget-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.8rem;
+    }
+    
+    .widget-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        border-radius: 2px;
+    }
+    
+    .categories-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .categories-list li {
+        margin-bottom: 0.8rem;
+        animation: fadeInRight 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .categories-list a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #475569;
+        text-decoration: none;
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    
+    .categories-list a:hover {
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.1), rgba(245, 158, 11, 0.1));
+        color: #4f46e5;
+        transform: translateX(5px);
+    }
+    
+    .categories-list a i {
+        color: #f59e0b;
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+    }
+    
+    .categories-list a:hover i {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .follow-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .follow-list li {
+        margin-bottom: 0.8rem;
+        animation: fadeInRight 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .follow-list a {
+        display: flex;
+        align-items: center;
+        color: #475569;
+        text-decoration: none;
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    
+    .follow-list a:hover {
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.1), rgba(245, 158, 11, 0.1));
+        color: #4f46e5;
+        transform: translateX(5px);
+    }
+    
+    .follow-list a i {
+        margin-right: 0.8rem;
+        width: 20px;
+        text-align: center;
+        color: #f59e0b;
+    }
+    
+    /* Animations */
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes zoomIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    
+    /* Animation Delays */
+    .content-section:nth-child(1) { animation-delay: 0.1s; }
+    .content-section:nth-child(2) { animation-delay: 0.2s; }
+    
+    .comment-card:nth-child(1) { animation-delay: 0.1s; }
+    .comment-card:nth-child(2) { animation-delay: 0.2s; }
+    .comment-card:nth-child(3) { animation-delay: 0.3s; }
+    .comment-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    .categories-list li:nth-child(1) { animation-delay: 0.1s; }
+    .categories-list li:nth-child(2) { animation-delay: 0.2s; }
+    .categories-list li:nth-child(3) { animation-delay: 0.3s; }
+    .categories-list li:nth-child(4) { animation-delay: 0.4s; }
+    
+    .follow-list li:nth-child(1) { animation-delay: 0.1s; }
+    .follow-list li:nth-child(2) { animation-delay: 0.2s; }
+    .follow-list li:nth-child(3) { animation-delay: 0.3s; }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .post-title {
+            font-size: 2.5rem;
+        }
+        
+        .featured-image-container {
+            margin: 1.5rem 0;
+        }
+        
+        .content-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .post-title {
+            font-size: 2rem;
+        }
+        
+        .post-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+        
+        .comments-section,
+        .comment-form-container {
+            padding: 1.5rem;
+        }
+        
+        .sidebar-widget {
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
 
-
-{% comment %} {% if blog_post %}
-<div class="container mt-4">
+<!-- Page Content -->
+<div class="container post-container mt-4">
     <div class="row">
-        <div class="col-md-12">
-            <h1 class="mb-3">{{ blog_post.title }}</h1>
-            <p class="text-muted">By {{ blog_post.author }} | {{ blog_post.created_at|date:"F j, Y" }}</p>
-            {% if blog_post.featured_image %}
-            <img src="{{ blog_post.featured_image.url }}" class="img-fluid mb-4" alt="{{ blog_post.title }}">
-            {% endif %}
-            <div class="blog-content">
-                {{ blog_post.content|safe }}
-            </div>
-        </div>
-    </div>
-
-</div>
-{% else %}
-<p>Blog post not found.</p>
-{% endif %} {% endcomment %}
-<!-- Page content-->
-<div class="container mt-5">
-    <div class="row">
+        <!-- Main Content -->
         <div class="col-lg-8">
-            <!-- Post content-->
-            <article>
-                <!-- Post header-->
-                <header class="mb-4">
-                    <!-- Post title-->
-                    <h1 class="fw-bolder mb-1">{{ blog_post.title }}</h1>
-                    <!-- Post meta content-->
-                    <div class="text-muted fst-italic mb-2">Posted on {{ blog_post.created_at|date:"F j, Y" }} by {{ blog_post.author }}</div>
-                    <!-- Post category-->
-                    <a class="badge bg-warning text-decoration-none text-light" href="{% url 'post_by_category' blog_post.category.id %}">{{ blog_post.category }}</a>
-                </header>
-                <!-- Preview image figure-->
-                 {% if blog_post.featured_image %}
-                <figure class="mb-4"><img class="img-fluid rounded" src="{{ blog_post.featured_image.url }}" alt="NO IMAGE FOUND" /></figure>
-                {% else %}
-                <figure class="mb-4"><img class="img-fluid rounded" src="https://via.placeholder.com/900x300.png?text=No+Image+Available" alt="No Image Available" /></figure>
-                {% endif %}
-                <!-- Post content-->
-                <section class="mb-5">
-                    <h2 class="text-warning">Short description</h2>
-                    <p class="fs-5 mb-4">{{ blog_post.short_description|safe }}</p>
-                    <h2 class="text-warning">Blog Content</h2>
-                    <p class="fs-5 mb-4">{{ blog_post.content|safe }}</p>
-                    </section>
-            </article>
-        </div>
-        <!-- Side widgets-->
-        <div class="col-lg-4">
-            
-            <!-- Categories widget-->
-            <div class="card mb-4 p-3">
-                <h4 class="font-italic">Categories</h4>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <ul class="list-unstyled mb-0">
-                                {% for i in categories%}
-                                <li><a href="{% url 'post_by_category' i.id %}">{{ i.category_name }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    
+            <!-- Post Header -->
+            <header class="post-header">
+                <h1 class="post-title">{{ blog_post.title }}</h1>
+                
+                <div class="post-meta">
+                    <div class="meta-item">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>Posted on {{ blog_post.created_at|date:"F j, Y" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="far fa-user"></i>
+                        <span>By {{ blog_post.author }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="far fa-clock"></i>
+                        <span>{{ blog_post.created_at|timesince }} ago</span>
                     </div>
                 </div>
-            </div>
-            <!-- Side widget-->
-             {% if follow_us_info %}
-            <div class="card mb-4 p-3">
-                <h4 class="font-italic">Follow Us</h4>
-                <ol class="list-unstyled">
-                    {% for follow_us in follow_us_info %}
-                    <li><a href="{{ follow_us.platform_url }}">{{ follow_us.platform_name }}</a></li>
+                
+                <a class="category-badge" href="{% url 'post_by_category' blog_post.category.id %}">
+                    <i class="fas fa-tag"></i> {{ blog_post.category }}
+                </a>
+            </header>
+            
+            <!-- Featured Image -->
+            <figure class="featured-image-container">
+                {% if blog_post.featured_image %}
+                    <img class="img-fluid" src="{{ blog_post.featured_image.url }}" alt="{{ blog_post.title }}" />
+                {% else %}
+                    <div class="image-placeholder">
+                        <div class="text-center">
+                            <i class="fas fa-image fa-3x mb-3"></i>
+                            <p>No Image Available</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </figure>
+            
+            <!-- Short Description -->
+            <section class="content-section">
+                <h2 class="section-title">Short Description</h2>
+                <div class="content-text">
+                    {{ blog_post.short_description|safe }}
+                </div>
+            </section>
+            
+            <!-- Main Content -->
+            <section class="content-section">
+                <h2 class="section-title">Blog Content</h2>
+                <div class="content-text">
+                    {{ blog_post.content|safe }}
+                </div>
+            </section>
+            
+            <!-- Comments Section -->
+            <div class="comments-section">
+                <div class="comments-header">
+                    <h2 class="section-title mb-0">Comments</h2>
+                    <span class="comments-count">{{ comment_count }}</span>
+                </div>
+                
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div class="comment-card">
+                            <div class="comment-header">
+                                <div class="comment-user">
+                                    <i class="fas fa-user-circle"></i>
+                                    {{ comment.user.username }}
+                                </div>
+                                <div class="comment-time">
+                                    <i class="far fa-clock"></i>
+                                    {{ comment.created_at|timesince }} ago
+                                </div>
+                            </div>
+                            <p class="comment-text">{{ comment.comment }}</p>
+                        </div>
                     {% endfor %}
-                </ol>
+                {% else %}
+                    <div class="no-comments">
+                        <i class="far fa-comment-dots"></i>
+                        <h4>No comments yet</h4>
+                        <p>Be the first to share your thoughts!</p>
+                    </div>
+                {% endif %}
             </div>
+            
+            <!-- Comment Form -->
+            <div class="comment-form-container">
+                <h3 class="section-title mb-4">Add a Comment</h3>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="comment" class="form-label">Your Comment</label>
+                        <textarea name="comment" class="form-control" placeholder="Share your thoughts about this post..." rows="6" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn mt-3">
+                        <i class="fas fa-paper-plane"></i>
+                        Post Comment
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Categories Widget -->
+            <div class="sidebar-widget">
+                <h4 class="widget-title">Categories</h4>
+                <ul class="categories-list">
+                    {% for i in categories %}
+                        <li>
+                            <a href="{% url 'post_by_category' i.id %}">
+                                <span>{{ i.category_name }}</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <!-- Follow Us Widget -->
+            {% if follow_us_info %}
+                <div class="sidebar-widget">
+                    <h4 class="widget-title">Follow Us</h4>
+                    <ul class="follow-list">
+                        {% for follow_us in follow_us_info %}
+                            <li>
+                                <a href="{{ follow_us.platform_url }}" target="_blank">
+                                    {% if "facebook" in follow_us.platform_name|lower %}
+                                        <i class="fab fa-facebook-f"></i>
+                                    {% elif "twitter" in follow_us.platform_name|lower %}
+                                        <i class="fab fa-twitter"></i>
+                                    {% elif "instagram" in follow_us.platform_name|lower %}
+                                        <i class="fab fa-instagram"></i>
+                                    {% elif "linkedin" in follow_us.platform_name|lower %}
+                                        <i class="fab fa-linkedin-in"></i>
+                                    {% elif "youtube" in follow_us.platform_name|lower %}
+                                        <i class="fab fa-youtube"></i>
+                                    {% elif "github" in follow_us.platform_name|lower %}
+                                        <i class="fab fa-github"></i>
+                                    {% else %}
+                                        <i class="fas fa-external-link-alt"></i>
+                                    {% endif %}
+                                    <span>{{ follow_us.platform_name }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
+            
+            <!-- Share Widget -->
+            <div class="sidebar-widget">
+                <h4 class="widget-title">Share This Post</h4>
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <a href="#" class="btn btn-primary rounded-circle p-3 share-btn" data-platform="facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="btn btn-info rounded-circle p-3 share-btn" data-platform="twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="btn btn-danger rounded-circle p-3 share-btn" data-platform="linkedin">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="btn btn-dark rounded-circle p-3 share-btn" data-platform="copy">
+                        <i class="fas fa-link"></i>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Animation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Parallax effect for featured image
+        const featuredImage = document.querySelector('.featured-image-container');
+        if (featuredImage) {
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const rate = scrolled * 0.3;
+                featuredImage.style.transform = `translateY(${rate}px) scale(1.01)`;
+            });
+        }
+        
+        // Share functionality
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const platform = this.getAttribute('data-platform');
+                const url = window.location.href;
+                const title = document.querySelector('.post-title').textContent;
+                
+                let shareUrl = '';
+                
+                switch(platform) {
+                    case 'facebook':
+                        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                        break;
+                    case 'twitter':
+                        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+                        break;
+                    case 'linkedin':
+                        shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
+                        break;
+                    case 'copy':
+                        navigator.clipboard.writeText(url).then(() => {
+                            // Show copied notification
+                            const originalHTML = this.innerHTML;
+                            this.innerHTML = '<i class="fas fa-check"></i>';
+                            this.style.background = '#10b981';
+                            
+                            setTimeout(() => {
+                                this.innerHTML = originalHTML;
+                                this.style.background = '';
+                            }, 2000);
+                        });
+                        return;
+                }
+                
+                if (shareUrl) {
+                    window.open(shareUrl, '_blank', 'width=600,height=400');
+                }
+            });
+        });
+        
+        // Comment form animation
+        const commentForm = document.querySelector('form');
+        if (commentForm) {
+            commentForm.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('.submit-btn');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+                    submitBtn.disabled = true;
+                }
+            });
+        }
+        
+        // Highlight code blocks if any
+        document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightBlock(block);
+        });
+        
+        // Lazy loading for images in content
+        const images = document.querySelectorAll('.content-text img');
+        images.forEach(img => {
+            img.classList.add('img-fluid', 'rounded', 'mb-3');
+            img.style.transition = 'transform 0.5s ease';
+            img.addEventListener('load', function() {
+                this.style.opacity = '1';
+                this.style.transform = 'scale(1)';
+            });
+            img.style.opacity = '0';
+            img.style.transform = 'scale(0.95)';
+        });
+    });
+</script>
 {% endblock %}

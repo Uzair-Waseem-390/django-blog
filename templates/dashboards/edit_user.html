@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="nav flex-column nav-pills bg-light" aria-orientation="vertical">
+                <a class="nav-link active text-dark bg-warning" href="#">Dashboard Home</a>
+                <a class="nav-link" href="{% url 'add_category' %}">Add Category</a>
+                <a class="nav-link" href="{% url 'add_post' %}">Add Post</a>
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card border-default">
+                <div class="card-header text-center text-uppercase font-weight-bold">
+                    Edit User
+                </div>
+
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Username -->
+                        <div class="form-group">
+                            <label>Username</label>
+                            {{ form.username }}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label>Email</label>
+                            {{ form.email }}
+                        </div>
+
+                        <!-- Staff Status -->
+                        <div class="form-group form-check">
+                            {{ form.is_staff }}
+                            <label class="form-check-label">
+                                Staff User
+                            </label>
+                        </div>
+
+                        <!-- Active Status -->
+                        <div class="form-group form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label">
+                                Active
+                            </label>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-right">
+                            <a href="{% url 'manager_dashboard' %}" class="btn btn-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Save Changes
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -2,33 +2,669 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="row justify-content-center mt-4">
-    <div class="col-md-6">
+<style>
+    /* Register Page Specific Styles */
+    .register-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        animation: fadeIn 0.8s ease-out;
+    }
+    
+    .register-card {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        position: relative;
+        max-width: 500px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .register-card:hover {
+        transform: translateY(-10px) scale(1.01);
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.2);
+    }
+    
+    .register-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(90deg, #4f46e5, #7c3aed, #f59e0b);
+        background-size: 200% 100%;
+        animation: gradientShift 3s ease infinite;
+    }
+    
+    .register-header {
+        padding: 3rem 3rem 1.5rem;
+        text-align: center;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .register-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234f46e5' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .register-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        z-index: 2;
+        animation: float 6s ease-in-out infinite;
+        box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
+    }
+    
+    .register-icon i {
+        font-size: 2.5rem;
+        color: white;
+    }
+    
+    .register-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 2.5rem;
+        background: linear-gradient(90deg, #4f46e5, #f59e0b);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .register-subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .register-body {
+        padding: 2rem 3rem 3rem;
+        position: relative;
+    }
+    
+    /* Form Styles */
+    .register-form {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Crispy Forms Customization */
+    .form-group {
+        margin-bottom: 1.5rem;
+        animation: slideUp 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    /* Animation delays for form groups */
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+    
+    label {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        display: block;
+        transition: color 0.3s ease;
+    }
+    
+    label:hover {
+        color: #4f46e5;
+    }
+    
+    .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.9rem 1.2rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-control:focus {
+        border-color: #4f46e5;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #ef4444;
+        background: #fef2f2;
+    }
+    
+    .form-control.is-valid {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    
+    /* Password strength indicator */
+    .password-strength {
+        margin-top: 0.5rem;
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .password-strength-meter {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+        transition: width 0.3s ease;
+        border-radius: 2px;
+    }
+    
+    /* Submit Button */
+    .submit-btn {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        width: 100%;
+        margin-top: 1.5rem;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+        background: linear-gradient(90deg, #4338ca, #6d28d9);
+    }
+    
+    .submit-btn:active {
+        transform: translateY(-1px);
+    }
+    
+    .submit-btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+    
+    .submit-btn:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+    }
+    
+    .submit-btn i {
+        transition: transform 0.3s ease;
+    }
+    
+    .submit-btn:hover i {
+        transform: translateX(5px);
+    }
+    
+    /* Login Link */
+    .login-link {
+        text-align: center;
+        margin-top: 2rem;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+    
+    .login-link a {
+        color: #4f46e5;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+        padding-bottom: 2px;
+    }
+    
+    .login-link a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #4f46e5, #f59e0b);
+        transition: width 0.3s ease;
+    }
+    
+    .login-link a:hover {
+        color: #f59e0b;
+    }
+    
+    .login-link a:hover::after {
+        width: 100%;
+    }
+    
+    /* Terms and Conditions */
+    .terms-checkbox {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.8rem;
+        margin-top: 1rem;
+    }
+    
+    .terms-checkbox input[type="checkbox"] {
+        margin-top: 0.3rem;
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        accent-color: #4f46e5;
+    }
+    
+    .terms-checkbox label {
+        font-size: 0.9rem;
+        color: #64748b;
+        font-weight: normal;
+        line-height: 1.5;
+        cursor: pointer;
+    }
+    
+    .terms-checkbox a {
+        color: #4f46e5;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    
+    .terms-checkbox a:hover {
+        color: #f59e0b;
+        text-decoration: underline;
+    }
+    
+    /* Error Messages */
+    .alert {
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border: none;
+        animation: shake 0.5s ease;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        color: #065f46;
+        border-left: 4px solid #10b981;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes gradientShift {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-15px);
+        }
+    }
+    
+    @keyframes ripple {
+        0% {
+            transform: scale(0, 0);
+            opacity: 1;
+        }
+        20% {
+            transform: scale(25, 25);
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: scale(40, 40);
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+        }
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .register-container {
+            padding: 1rem;
+        }
+        
+        .register-card {
+            margin: 1rem;
+        }
+        
+        .register-header {
+            padding: 2rem 2rem 1rem;
+        }
+        
+        .register-body {
+            padding: 1.5rem 2rem 2rem;
+        }
+        
+        .register-title {
+            font-size: 2rem;
+        }
+        
+        .register-icon {
+            width: 70px;
+            height: 70px;
+        }
+        
+        .register-icon i {
+            font-size: 2rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .register-header {
+            padding: 1.5rem 1.5rem 1rem;
+        }
+        
+        .register-body {
+            padding: 1rem 1.5rem 1.5rem;
+        }
+        
+        .register-title {
+            font-size: 1.8rem;
+        }
+        
+        .register-subtitle {
+            font-size: 1rem;
+        }
+        
+        .form-control {
+            padding: 0.8rem 1rem;
+        }
+        
+        .submit-btn {
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+        }
+    }
+</style>
 
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-
-                <h3 class="text-uppercase text-warning text-center mb-4"
-                    style="letter-spacing: 2px;">
-                    Register
-                </h3>
-
-                <form method="POST" novalidate>
-                    {% csrf_token %}
-
-                    <!-- ✅ Correct crispy usage -->
-                    {{ form|crispy }}
-
-                    <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-primary btn-block">
-                            Create Account
-                        </button>
-                    </div>
-                </form>
-
+<div class="register-container">
+    <div class="register-card">
+        <!-- Register Header -->
+        <div class="register-header">
+            <div class="register-icon">
+                <i class="fas fa-user-plus"></i>
             </div>
+            <h1 class="register-title">Create Account</h1>
+            <p class="register-subtitle">Join our blogging community</p>
         </div>
-
+        
+        <!-- Register Body -->
+        <div class="register-body">
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Please correct the errors below.
+            </div>
+            {% endif %}
+            
+            <form method="POST" novalidate class="register-form">
+                {% csrf_token %}
+                
+                <!-- Crispy Form with Custom Styling -->
+                <div class="form-row">
+                    {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ field.errors|striptags }}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Password strength indicator for password fields -->
+                        {% if field.name == 'password1' or field.name == 'password2' %}
+                        <div class="password-strength">
+                            <div class="password-strength-meter"></div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Terms and Conditions -->
+                <div class="terms-checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">
+                    <span>Create Account</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                
+                <!-- Login Link -->
+                <div class="login-link">
+                    Already have an account? 
+                    <a href="{% url 'login' %}">Sign in here</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+<!-- Animation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form field focus effects
+        const formControls = document.querySelectorAll('.form-control');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                this.parentElement.querySelector('label').style.color = '#4f46e5';
+            });
+            
+            control.addEventListener('blur', function() {
+                this.parentElement.querySelector('label').style.color = '#1e293b';
+            });
+        });
+        
+        // Password strength indicator
+        const passwordInput = document.querySelector('input[name="password1"]');
+        const passwordStrength = document.querySelector('.password-strength-meter');
+        
+        if (passwordInput && passwordStrength) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                // Check password strength
+                if (password.length >= 8) strength += 25;
+                if (/[A-Z]/.test(password)) strength += 25;
+                if (/[0-9]/.test(password)) strength += 25;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+                
+                // Update strength meter
+                passwordStrength.style.width = strength + '%';
+                
+                // Update color based on strength
+                if (strength < 50) {
+                    passwordStrength.style.background = '#ef4444';
+                } else if (strength < 75) {
+                    passwordStrength.style.background = '#f59e0b';
+                } else {
+                    passwordStrength.style.background = '#10b981';
+                }
+            });
+        }
+        
+        // Form validation animations
+        const form = document.querySelector('.register-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('.submit-btn');
+                if (submitBtn) {
+                    // Show loading state
+                    const originalHTML = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                    submitBtn.disabled = true;
+                    
+                    // Revert after 3 seconds if still on page (form submission failed)
+                    setTimeout(() => {
+                        if (submitBtn.disabled) {
+                            submitBtn.innerHTML = originalHTML;
+                            submitBtn.disabled = false;
+                        }
+                    }, 3000);
+                }
+            });
+        }
+        
+        // Input validation animations
+        formControls.forEach(control => {
+            control.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.add('is-valid');
+                    this.classList.remove('is-invalid');
+                } else {
+                    this.classList.remove('is-valid');
+                }
+            });
+            
+            control.addEventListener('blur', function() {
+                if (this.value.trim() === '' && this.required) {
+                    this.classList.add('is-invalid');
+                }
+            });
+        });
+        
+        // Terms checkbox animation
+        const termsCheckbox = document.querySelector('#terms');
+        if (termsCheckbox) {
+            termsCheckbox.addEventListener('change', function() {
+                const submitBtn = document.querySelector('.submit-btn');
+                if (submitBtn) {
+                    if (this.checked) {
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                    } else {
+                        submitBtn.disabled = true;
+                        submitBtn.style.opacity = '0.7';
+                    }
+                }
+            });
+            
+            // Initialize submit button state
+            const submitBtn = document.querySelector('.submit-btn');
+            if (submitBtn && !termsCheckbox.checked) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.7';
+            }
+        }
+        
+        // Floating icon animation on hover
+        const registerIcon = document.querySelector('.register-icon');
+        if (registerIcon) {
+            registerIcon.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            
+            registerIcon.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+        
+        // Card hover effect on form focus
+        const registerCard = document.querySelector('.register-card');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                registerCard.style.transform = 'translateY(-10px) scale(1.01)';
+            });
+            
+            control.addEventListener('blur', function() {
+                registerCard.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    });
+</script>
 {% endblock %}

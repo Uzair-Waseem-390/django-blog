@@ -1,0 +1,684 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* 403 Page Specific Styles */
+    .error-403-container {
+        min-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .error-403-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef4444' fill-opacity='0.03'%3E%3Cpath d='M60 120c33.137 0 60-26.863 60-60S93.137 0 60 0 0 26.863 0 60s26.863 60 60 60zm0-20c22.091 0 40-17.909 40-40S82.091 20 60 20 20 37.909 20 60s17.909 40 40 40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        z-index: -1;
+    }
+    
+    /* Security Shield */
+    .security-shield {
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2.5rem;
+        position: relative;
+        animation: float 6s ease-in-out infinite;
+        border: 8px solid #fecaca;
+        box-shadow: 0 20px 40px rgba(239, 68, 68, 0.15);
+    }
+    
+    .security-shield i {
+        font-size: 5rem;
+        color: #ef4444;
+        animation: pulse 2s infinite;
+    }
+    
+    /* Error Code */
+    .error-403-code {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 8rem;
+        line-height: 1;
+        background: linear-gradient(90deg, #ef4444, #f97316);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+        text-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+    }
+    
+    .error-403-code::after {
+        content: '';
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 4px;
+        background: linear-gradient(90deg, #ef4444, #f97316);
+        border-radius: 2px;
+        opacity: 0.5;
+    }
+    
+    /* Error Message */
+    .error-403-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 800;
+        font-size: 2.8rem;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        animation: slideUp 0.8s ease-out 0.2s both;
+    }
+    
+    .error-403-description {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        animation: slideUp 0.8s ease-out 0.3s both;
+    }
+    
+    /* Permission Details */
+    .permission-details {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem auto 3rem;
+        max-width: 600px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #ef4444;
+        animation: slideUp 0.8s ease-out 0.4s both;
+    }
+    
+    .permission-title {
+        font-size: 1.3rem;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .permission-title i {
+        color: #ef4444;
+    }
+    
+    .permission-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .permission-list li {
+        padding: 0.5rem 0;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .permission-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .permission-list i {
+        color: #f59e0b;
+        width: 20px;
+    }
+    
+    /* User Role Info */
+    .user-role-info {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 2px solid #e2e8f0;
+        animation: slideUp 0.8s ease-out 0.5s both;
+    }
+    
+    .current-role {
+        display: inline-block;
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-left: 0.5rem;
+        animation: pulse 2s infinite;
+    }
+    
+    /* Action Buttons */
+    .action-buttons-403 {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+        animation: slideUp 0.8s ease-out 0.6s both;
+    }
+    
+    .btn-403 {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-403::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+    
+    .btn-403:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+    }
+    
+    .btn-primary-403 {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+    }
+    
+    .btn-primary-403:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+        color: white;
+    }
+    
+    .btn-secondary-403 {
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        color: white;
+        box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+    }
+    
+    .btn-secondary-403:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(245, 158, 11, 0.4);
+        color: white;
+    }
+    
+    .btn-outline-403 {
+        background: white;
+        color: #ef4444;
+        border: 2px solid #ef4444;
+    }
+    
+    .btn-outline-403:hover {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), rgba(249, 115, 22, 0.1));
+        transform: translateY(-3px);
+    }
+    
+    .btn-403 i {
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-403:hover i {
+        transform: translateX(5px);
+    }
+    
+    /* Contact Admin */
+    .contact-admin {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f1f5f9;
+        text-align: center;
+        animation: slideUp 0.8s ease-out 0.7s both;
+    }
+    
+    .contact-text {
+        color: #64748b;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-email {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f8fafc;
+        color: #4f46e5;
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .contact-email:hover {
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.1), rgba(245, 158, 11, 0.1));
+        border-color: #4f46e5;
+        transform: translateY(-2px);
+    }
+    
+    /* Animations */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    
+    @keyframes ripple {
+        0% {
+            transform: scale(0, 0);
+            opacity: 1;
+        }
+        20% {
+            transform: scale(25, 25);
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: scale(40, 40);
+        }
+    }
+    
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+        }
+        20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .error-403-container {
+            padding: 3rem 1rem;
+        }
+        
+        .error-403-code {
+            font-size: 6rem;
+        }
+        
+        .error-403-title {
+            font-size: 2.2rem;
+        }
+        
+        .error-403-description {
+            font-size: 1.1rem;
+            padding: 0 1rem;
+        }
+        
+        .security-shield {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .security-shield i {
+            font-size: 4rem;
+        }
+        
+        .permission-details {
+            padding: 1.5rem;
+            margin: 1.5rem 1rem;
+        }
+        
+        .action-buttons-403 {
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .btn-403 {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .error-403-code {
+            font-size: 4.5rem;
+        }
+        
+        .error-403-title {
+            font-size: 1.8rem;
+        }
+        
+        .error-403-description {
+            font-size: 1rem;
+        }
+        
+        .permission-details {
+            padding: 1rem;
+        }
+        
+        .permission-title {
+            font-size: 1.1rem;
+        }
+        
+        .user-role-info {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<div class="error-403-container">
+    <!-- Security Shield -->
+    <div class="security-shield">
+        <i class="fas fa-shield-alt"></i>
+    </div>
+    
+    <!-- Error Code -->
+    <h1 class="error-403-code">403</h1>
+    
+    <!-- Error Message -->
+    <h2 class="error-403-title">Access Forbidden</h2>
+    
+    <p class="error-403-description">
+        You don't have permission to access this page. This area is restricted 
+        to authorized users only. Please check your credentials or contact 
+        the administrator if you believe this is an error.
+    </p>
+    
+    <!-- Permission Details -->
+    <div class="permission-details">
+        <h3 class="permission-title">
+            <i class="fas fa-lock"></i>
+            Restricted Access Area
+        </h3>
+        <ul class="permission-list">
+            <li>
+                <i class="fas fa-user-check"></i>
+                <span>This page requires specific user permissions</span>
+            </li>
+            <li>
+                <i class="fas fa-user-tag"></i>
+                <span>Only managers and editors can access this content</span>
+            </li>
+            <li>
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Your current role doesn't grant access to this resource</span>
+            </li>
+        </ul>
+        
+        <!-- User Role Info -->
+        <div class="user-role-info">
+            <p style="margin: 0; color: #475569;">
+                <strong>Your Current Role:</strong>
+                <span class="current-role">
+                    {% if user.is_authenticated %}
+                        {% if is_manager %}Manager
+                        {% elif is_editor %}Editor
+                        {% else %}User{% endif %}
+                    {% else %}
+                        Guest
+                    {% endif %}
+                </span>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons-403">
+        <a href="/" class="btn-403 btn-primary-403">
+            <i class="fas fa-home"></i>
+            <span>Go to Homepage</span>
+        </a>
+        
+        {% if not user.is_authenticated %}
+        <a href="{% url 'login' %}?next={{ request.path }}" class="btn-403 btn-secondary-403">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Login with Higher Privileges</span>
+        </a>
+        {% endif %}
+        
+        <a href="javascript:history.back()" class="btn-403 btn-outline-403">
+            <i class="fas fa-arrow-left"></i>
+            <span>Go Back</span>
+        </a>
+    </div>
+    
+    <!-- Contact Admin -->
+    <div class="contact-admin">
+        <p class="contact-text">
+            Need access to this page? Contact the site administrator:
+        </p>
+        <a href="mailto:admin@djangoblog.com" class="contact-email">
+            <i class="fas fa-envelope"></i>
+            admin@djangoblog.com
+        </a>
+    </div>
+</div>
+
+<!-- Animation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Button hover animations
+        const buttons = document.querySelectorAll('.btn-403');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateY(0)';
+                }
+            });
+            
+            button.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === 'javascript:history.back()') {
+                    e.preventDefault();
+                    // Add click animation
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        window.history.back();
+                    }, 200);
+                }
+                
+                // Add loading state for login button
+                if (this.querySelector('i.fa-sign-in-alt')) {
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                    }, 1500);
+                }
+            });
+        });
+        
+        // Security shield interaction
+        const securityShield = document.querySelector('.security-shield');
+        if (securityShield) {
+            securityShield.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1) rotate(10deg)';
+                this.style.transition = 'transform 0.3s ease';
+                this.style.borderColor = '#f87171';
+                this.style.boxShadow = '0 25px 50px rgba(239, 68, 68, 0.25)';
+            });
+            
+            securityShield.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+                this.style.borderColor = '#fecaca';
+                this.style.boxShadow = '0 20px 40px rgba(239, 68, 68, 0.15)';
+            });
+            
+            securityShield.addEventListener('click', function() {
+                // Add shake animation
+                this.style.animation = 'shake 0.5s ease';
+                setTimeout(() => {
+                    this.style.animation = 'float 6s ease-in-out infinite, pulse 2s infinite';
+                }, 500);
+            });
+        }
+        
+        // Error code animation
+        const errorCode = document.querySelector('.error-403-code');
+        if (errorCode) {
+            // Add subtle glow effect periodically
+            setInterval(() => {
+                errorCode.style.textShadow = '0 0 25px rgba(239, 68, 68, 0.3)';
+                setTimeout(() => {
+                    errorCode.style.textShadow = '0 10px 30px rgba(239, 68, 68, 0.2)';
+                }, 1000);
+            }, 4000);
+        }
+        
+        // Permission list item animations
+        const permissionItems = document.querySelectorAll('.permission-list li');
+        permissionItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+                item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            }, 500 + (index * 200));
+            
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(10px)';
+                this.style.background = 'linear-gradient(90deg, rgba(239, 68, 68, 0.05), rgba(249, 115, 22, 0.05))';
+                this.style.borderRadius = '8px';
+                this.style.paddingLeft = '1rem';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+                this.style.background = 'transparent';
+                this.style.borderRadius = '0';
+                this.style.paddingLeft = '0';
+            });
+        });
+        
+        // Current role badge animation
+        const currentRole = document.querySelector('.current-role');
+        if (currentRole) {
+            currentRole.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+                this.style.boxShadow = '0 10px 25px rgba(79, 70, 229, 0.4)';
+            });
+            
+            currentRole.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+            });
+        }
+        
+        // Contact email animation
+        const contactEmail = document.querySelector('.contact-email');
+        if (contactEmail) {
+            contactEmail.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('i');
+                icon.style.transform = 'scale(1.2)';
+                icon.style.transition = 'transform 0.3s ease';
+            });
+            
+            contactEmail.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('i');
+                icon.style.transform = 'scale(1)';
+            });
+            
+            contactEmail.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Copy email to clipboard
+                const email = this.textContent.trim();
+                navigator.clipboard.writeText(email).then(() => {
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied to clipboard!';
+                    this.style.background = '#10b981';
+                    this.style.borderColor = '#10b981';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                        this.style.background = '';
+                        this.style.borderColor = '';
+                    }, 2000);
+                });
+            });
+        }
+        
+        // Auto-focus on primary button for accessibility
+        setTimeout(() => {
+            const primaryButton = document.querySelector('.btn-primary-403');
+            if (primaryButton) {
+                primaryButton.focus();
+                primaryButton.style.boxShadow = '0 0 0 4px rgba(79, 70, 229, 0.3)';
+                setTimeout(() => {
+                    primaryButton.style.boxShadow = '';
+                }, 1000);
+            }
+        }, 1000);
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.history.back();
+            } else if (e.key === 'h' || e.key === 'H') {
+                window.location.href = '/';
+            } else if (e.key === 'l' || e.key === 'L') {
+                const loginBtn = document.querySelector('.btn-secondary-403');
+                if (loginBtn) loginBtn.click();
+            }
+        });
+    });
+</script>
+{% endblock %}

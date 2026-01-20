@@ -1,90 +1,1028 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <!-- Left Sidebar -->
-        <div class="col-md-3">
-            <div class="nav flex-column nav-pills bg-light" aria-orientation="vertical">
-                <a class="nav-link active text-dark bg-warning" href="#">Dashboard Home</a>
-                <a class="nav-link" href="{% url 'add_category' %}">Add Category</a>
-                <a class="nav-link" href="{% url 'add_post' %}">Add Post</a>
-                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+<style>
+    /* Dashboard Specific Styles */
+    .dashboard-container {
+        animation: fadeIn 0.8s ease-out;
+        padding-top: 2rem;
+    }
+    
+    /* Dashboard Header */
+    .dashboard-header {
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 20px;
+        color: white;
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
+        animation: slideDown 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .dashboard-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .dashboard-subtitle {
+        opacity: 0.9;
+        font-size: 1.1rem;
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
+    }
+    
+    .dashboard-icon {
+        position: absolute;
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 4rem;
+        opacity: 0.1;
+        z-index: 1;
+    }
+    
+    /* Dashboard Stats */
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        animation: slideUp 0.8s ease-out 0.2s both;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid #4f46e5;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, transparent, rgba(79, 70, 229, 0.03));
+        z-index: 1;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-card:nth-child(2) {
+        border-left-color: #f59e0b;
+    }
+    
+    .stat-card:nth-child(3) {
+        border-left-color: #10b981;
+    }
+    
+    .stat-card:nth-child(4) {
+        border-left-color: #ef4444;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .stat-card:nth-child(1) .stat-icon {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(79, 70, 229, 0.2));
+        color: #4f46e5;
+    }
+    
+    .stat-card:nth-child(2) .stat-icon {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.2));
+        color: #f59e0b;
+    }
+    
+    .stat-card:nth-child(3) .stat-icon {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.2));
+        color: #10b981;
+    }
+    
+    .stat-card:nth-child(4) .stat-icon {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.2));
+        color: #ef4444;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .stat-label {
+        color: #64748b;
+        font-size: 0.95rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Dashboard Layout */
+    .dashboard-layout {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    /* Sidebar Navigation */
+    .dashboard-sidebar {
+        flex: 0 0 250px;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        animation: slideInLeft 0.8s ease-out 0.3s both;
+        position: relative;
+        z-index: 10;
+    }
+    
+    .sidebar-header {
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 2px solid #f1f5f9;
+    }
+    
+    .sidebar-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-subtitle {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    
+    .nav-pills {
+        padding: 1.5rem;
+    }
+    
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.9rem 1.2rem;
+        margin-bottom: 0.8rem;
+        color: #475569;
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        border: 2px solid transparent;
+    }
+    
+    .nav-link i {
+        width: 20px;
+        text-align: center;
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .nav-link:hover {
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.1), rgba(245, 158, 11, 0.1));
+        color: #4f46e5;
+        border-color: rgba(79, 70, 229, 0.2);
+        transform: translateX(5px);
+    }
+    
+    .nav-link:hover i {
+        transform: scale(1.1);
+    }
+    
+    .nav-link.active {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+        border-color: transparent;
+    }
+    
+    .nav-link.active:hover {
+        background: linear-gradient(90deg, #4338ca, #6d28d9);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .nav-link.logout {
+        margin-top: 1rem;
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.2));
+        color: #ef4444;
+    }
+    
+    .nav-link.logout:hover {
+        background: linear-gradient(90deg, #ef4444, #f97316);
+        color: white;
+    }
+    
+    /* Main Content */
+    .dashboard-content {
+        flex: 1;
+        min-width: 300px;
+        animation: slideInRight 0.8s ease-out 0.4s both;
+    }
+    
+    /* Dashboard Cards */
+    .dashboard-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        border: 1px solid #f1f5f9;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+    
+    .card-header {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .card-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: #1e293b;
+        margin: 0;
+    }
+    
+    .add-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(90deg, #10b981, #34d399);
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    }
+    
+    .add-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+    
+    .card-body {
+        padding: 2rem;
+    }
+    
+    /* Categories List */
+    .categories-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .category-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border-left: 4px solid #4f46e5;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .category-item:hover {
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.1), rgba(245, 158, 11, 0.1));
+        transform: translateX(5px);
+    }
+    
+    .category-name {
+        font-weight: 500;
+        color: #1e293b;
+    }
+    
+    .category-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    /* Action Buttons */
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+    
+    .edit-btn {
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.1), rgba(79, 70, 229, 0.2));
+        color: #4f46e5;
+        border-color: rgba(79, 70, 229, 0.3);
+    }
+    
+    .edit-btn:hover {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .delete-btn {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.2));
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+    
+    .delete-btn:hover {
+        background: linear-gradient(90deg, #ef4444, #f97316);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Posts Table */
+    .posts-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .posts-table thead th {
+        background: #f8fafc;
+        padding: 1rem 1.2rem;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    
+    .posts-table tbody tr {
+        transition: all 0.3s ease;
+    }
+    
+    .posts-table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.05), rgba(245, 158, 11, 0.05));
+        transform: translateX(5px);
+    }
+    
+    .posts-table tbody td {
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid #f1f5f9;
+        color: #475569;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .status-published {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.2));
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    
+    .status-draft {
+        background: linear-gradient(90deg, rgba(100, 116, 139, 0.1), rgba(100, 116, 139, 0.2));
+        color: #64748b;
+        border: 1px solid rgba(100, 116, 139, 0.3);
+    }
+    
+    /* Empty States */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #94a3b8;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .empty-state p {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Animation delays for category items */
+    .category-item:nth-child(1) { animation-delay: 0.1s; }
+    .category-item:nth-child(2) { animation-delay: 0.2s; }
+    .category-item:nth-child(3) { animation-delay: 0.3s; }
+    .category-item:nth-child(4) { animation-delay: 0.4s; }
+    .category-item:nth-child(5) { animation-delay: 0.5s; }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .dashboard-layout {
+            flex-direction: column;
+        }
+        
+        .dashboard-sidebar {
+            flex: none;
+            width: 100%;
+        }
+        
+        .dashboard-stats {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        
+        .dashboard-header {
+            padding: 1.5rem;
+        }
+        
+        .dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .dashboard-icon {
+            font-size: 3rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .posts-table {
+            display: block;
+            overflow-x: auto;
+        }
+        
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .category-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .category-actions {
+            align-self: flex-end;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .dashboard-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .dashboard-header {
+            text-align: center;
+        }
+        
+        .dashboard-icon {
+            display: none;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="row align-items-center">
+            <div class="col-lg-10">
+                <h1 class="dashboard-title">Admin Dashboard</h1>
+                <p class="dashboard-subtitle">
+                    Welcome back, {{ user.username }}! Manage your blog content, categories, and posts from this centralized dashboard.
+                </p>
+            </div>
+            <div class="col-lg-2 text-lg-end">
+                <div class="dashboard-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
             </div>
         </div>
-
-        <!-- Right Content -->
-        <div class="col-md-9">
-
+    </div>
+    
+    <!-- Dashboard Stats -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <div class="stat-value">{{ categories|length }}</div>
+            <div class="stat-label">Total Categories</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-newspaper"></i>
+            </div>
+            <div class="stat-value">{{ posts|length }}</div>
+            <div class="stat-label">Total Posts</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">{{ posts|length }}</div>
+            <div class="stat-label">Published Posts</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Layout -->
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <div class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">Quick Actions</h3>
+                <p class="sidebar-subtitle">Manage your content</p>
+            </div>
+            
+            <div class="nav-pills">
+                <a class="nav-link active" href="#">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard Home</span>
+                </a>
+                <a class="nav-link" href="{% url 'add_category' %}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Category</span>
+                </a>
+                <a class="nav-link" href="{% url 'add_post' %}">
+                    <i class="fas fa-edit"></i>
+                    <span>Add Post</span>
+                </a>
+                <a class="nav-link logout" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="dashboard-content">
             <!-- Categories Card -->
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="text-uppercase font-weight-bold">All Categories</span>
-                    <a href="{% url 'add_category' %}" class="btn btn-sm btn-success">+ Add</a>
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">All Categories</h3>
+                    <a href="{% url 'add_category' %}" class="add-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Category
+                    </a>
                 </div>
                 <div class="card-body">
                     {% if categories %}
-                        <ul class="list-group">
+                        <ul class="categories-list">
                             {% for category in categories %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    {{ category.category_name }}
-                                    <div>
-                                        <a href="{% url 'edit_category' category.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <a href="{% url 'delete_category' category.id %}" class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('Delete this category?')">Delete</a>
+                                <li class="category-item">
+                                    <div class="category-name">{{ category.category_name }}</div>
+                                    <div class="category-actions">
+                                        <a href="{% url 'edit_category' category.id %}" class="action-btn edit-btn">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </a>
+                                        <a href="{% url 'delete_category' category.id %}" 
+                                           class="action-btn delete-btn"
+                                           onclick="return confirmDeleteCategory('{{ category.category_name }}')">
+                                            <i class="fas fa-trash"></i>
+                                            Delete
+                                        </a>
                                     </div>
                                 </li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-muted text-center">No categories found.</p>
+                        <div class="empty-state">
+                            <i class="fas fa-layer-group"></i>
+                            <p>No categories found. Start by adding your first category!</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
-
+            
             <!-- Posts Card -->
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="text-uppercase font-weight-bold">All Posts</span>
-                    <a href="{% url 'add_post' %}" class="btn btn-sm btn-success">+ Add</a>
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">All Posts</h3>
+                    <a href="{% url 'add_post' %}" class="add-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Post
+                    </a>
                 </div>
                 <div class="card-body">
                     {% if posts %}
-                        <table class="table table-hover">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Category</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for post in posts %}
-                                <tr>
-                                    <td>{{ post.title }}</td>
-                                    <td>{{ post.category.category_name }}</td>
-                                    <td>
-                                        <span class="badge badge-{% if post.status == 'Publish' %}success{% else %}secondary{% endif %}">
-                                            {{ post.status }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'edit_post' post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <a href="{% url 'delete_post' post.id %}" class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('Delete this post?')">Delete</a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="posts-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for post in posts %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ post.title|truncatechars:30 }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="category-badge">
+                                                {{ post.category.category_name }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge status-{{ post.status|lower }}">
+                                                {% if post.status == 'Publish' %}
+                                                    <i class="fas fa-check-circle"></i>
+                                                {% else %}
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                {% endif %}
+                                                {{ post.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="{% url 'edit_post' post.id %}" class="action-btn edit-btn">
+                                                    <i class="fas fa-edit"></i>
+                                                    Edit
+                                                </a>
+                                                <a href="{% url 'delete_post' post.id %}" 
+                                                   class="action-btn delete-btn"
+                                                   onclick="return confirmDeletePost('{{ post.title }}')">
+                                                    <i class="fas fa-trash"></i>
+                                                    Delete
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% else %}
-                        <p class="text-muted text-center">No posts found.</p>
+                        <div class="empty-state">
+                            <i class="fas fa-newspaper"></i>
+                            <p>No posts found. Start by creating your first blog post!</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
-
         </div>
     </div>
 </div>
+
+<!-- Animation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Stat cards counter animation
+        const statValues = document.querySelectorAll('.stat-value');
+        statValues.forEach(stat => {
+            const finalValue = parseInt(stat.textContent);
+            let currentValue = 0;
+            const increment = finalValue / 50;
+            const interval = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= finalValue) {
+                    stat.textContent = finalValue;
+                    clearInterval(interval);
+                } else {
+                    stat.textContent = Math.floor(currentValue);
+                }
+            }, 30);
+        });
+        
+        // Nav link animations
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'scale(1.2)';
+                }
+            });
+            
+            link.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'scale(1)';
+                }
+            });
+            
+            link.addEventListener('click', function(e) {
+                if (this.classList.contains('logout')) {
+                    e.preventDefault();
+                    // Add logout confirmation with animation
+                    this.style.transform = 'scale(0.95)';
+                    this.style.background = 'linear-gradient(90deg, #dc2626, #ef4444)';
+                    
+                    setTimeout(() => {
+                        if (confirm('Are you sure you want to logout?')) {
+                            window.location.href = this.getAttribute('href');
+                        } else {
+                            this.style.transform = '';
+                            this.style.background = '';
+                        }
+                    }, 200);
+                } else if (this.classList.contains('active')) {
+                    e.preventDefault();
+                    // Add active link animation
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                }
+            });
+        });
+        
+        // Category item hover effects
+        const categoryItems = document.querySelectorAll('.category-item');
+        categoryItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                const actions = this.querySelector('.category-actions');
+                if (actions) {
+                    actions.style.opacity = '1';
+                    actions.style.transform = 'translateX(0)';
+                }
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                const actions = this.querySelector('.category-actions');
+                if (actions) {
+                    actions.style.opacity = '0.8';
+                    actions.style.transform = 'translateX(5px)';
+                }
+            });
+        });
+        
+        // Table row hover effects
+        const tableRows = document.querySelectorAll('.posts-table tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                const actions = this.querySelector('.action-buttons');
+                if (actions) {
+                    actions.style.opacity = '1';
+                    actions.style.transform = 'translateX(0)';
+                }
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                const actions = this.querySelector('.action-buttons');
+                if (actions) {
+                    actions.style.opacity = '0.8';
+                    actions.style.transform = 'translateX(5px)';
+                }
+            });
+        });
+        
+        // Action button animations
+        const actionButtons = document.querySelectorAll('.action-btn');
+        actionButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) scale(1.05)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+            
+            button.addEventListener('click', function(e) {
+                if (this.classList.contains('delete-btn')) {
+                    e.preventDefault();
+                    // Add click animation before confirmation
+                    this.style.transform = 'scale(0.9)';
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    
+                    // Get item name from onclick attribute
+                    const onclickAttr = this.getAttribute('onclick');
+                    const itemName = onclickAttr ? onclickAttr.match(/'([^']+)'/)[1] : 'this item';
+                    
+                    setTimeout(() => {
+                        if (confirm(`Are you sure you want to delete "${itemName}"? This action cannot be undone.`)) {
+                            window.location.href = this.getAttribute('href');
+                        } else {
+                            this.innerHTML = originalHTML;
+                            this.style.transform = '';
+                        }
+                    }, 300);
+                }
+            });
+        });
+        
+        // Add button animations
+        const addButtons = document.querySelectorAll('.add-btn');
+        addButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'rotate(90deg)';
+                    icon.style.transition = 'transform 0.3s ease';
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+        
+        // Dashboard card animations on hover
+        const dashboardCards = document.querySelectorAll('.dashboard-card');
+        dashboardCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const header = this.querySelector('.card-header');
+                if (header) {
+                    header.style.transform = 'translateY(-2px)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                const header = this.querySelector('.card-header');
+                if (header) {
+                    header.style.transform = 'translateY(0)';
+                }
+            });
+        });
+        
+        // Status badge animations
+        const statusBadges = document.querySelectorAll('.status-badge');
+        statusBadges.forEach(badge => {
+            badge.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+            });
+            
+            badge.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Refresh stats animation
+        setInterval(() => {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.style.transform = 'translateY(-5px)';
+                setTimeout(() => {
+                    card.style.transform = 'translateY(0)';
+                }, 300);
+            });
+        }, 10000);
+    });
+    
+    // Custom confirmation functions
+    function confirmDeleteCategory(categoryName) {
+        return confirm(`Are you sure you want to delete the category "${categoryName}"? All posts in this category will be moved to "Uncategorized".`);
+    }
+    
+    function confirmDeletePost(postTitle) {
+        return confirm(`Are you sure you want to delete the post "${postTitle}"? This action cannot be undone.`);
+    }
+</script>
 {% endblock %}

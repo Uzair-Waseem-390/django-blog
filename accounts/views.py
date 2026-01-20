@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+
+from .utils import is_editor, is_manager
 from .forms import UserRegisterForm, LoginForm
 from django.contrib.auth import login, logout
 # Create your views here.
@@ -22,7 +24,12 @@ def login_view(request):
         # log user in
         
         login(request, form.get_user())
-        return redirect('dashboard')  # Redirect to a success page.
+        if is_manager(request.user):
+            return redirect('manager_dashboard')  # Redirect to manager dashboard 
+        elif is_editor(request.user):
+            return redirect('dashboard')  # Redirect to editor dashboard 
+        else:
+            return redirect('/')  # Default redirect
     context = {'form': form}
     return render(request, 'login.html', context)
 
